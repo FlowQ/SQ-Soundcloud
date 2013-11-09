@@ -4,7 +4,7 @@
 
   if(strpos($_SERVER['HTTP_HOST'], 'localhost')!==false) {
     require_once ('config_dev.php'); //dev
-    echo "dev";
+    echo "dev'";
   } else {
     require_once ('config.php'); //prod
   }  
