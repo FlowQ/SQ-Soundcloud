@@ -1,8 +1,12 @@
 <?php
 	session_start();
 	require_once 'Services/Soundcloud.php';
-	//require_once 'config.php';
-	require_once 'config_dev.php';
+	if(strpos($_SERVER['HTTP_HOST'], 'localhost')!==false) {
+	    require_once ('config_dev.php'); //dev
+	    echo "dev'";
+	 } else {
+	    require_once ('config.php'); //prod
+	 }  
 	
 	$_SESSION['lol'] = '12';
 	// create client object with app credentials

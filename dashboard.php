@@ -1,7 +1,6 @@
 <?php
   session_start();
   error_reporting(E_ALL);
-
   if(strpos($_SERVER['HTTP_HOST'], 'localhost')!==false) {
     require_once ('config_dev.php'); //dev
     echo "dev'";
@@ -9,7 +8,10 @@
     require_once ('config.php'); //prod
   }  
   require_once 'Services/Soundcloud.php';
-
+  $client = new Services_Soundcloud(APP_ID, APP_SECRET, CALLBACK_URL);
+  if(isset($_GET['code'])) {
+    callback($client);
+  }
 
   function callback($client) {
     $code = $_GET['code'];
@@ -18,10 +20,6 @@
       CURLOPT_SSL_VERIFYPEER => false
     ));
     $_SESSION['token'] = $client->accessToken($code);
-  }
-  $client = new Services_Soundcloud(APP_ID, APP_SECRET, CALLBACK_URL);
-  if(isset($_GET['code'])) {
-    callback($client);
   }
   $client->setAccessToken($_SESSION['token']['access_token']);
 
@@ -65,6 +63,40 @@
     $del->execute();
   }
 
+  function getStats()
+  {
+    $myID = '32869948';
+  
+    $pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+    $bdd = new PDO(DSN, DB_USERNAME, DB_PASSWORD, $pdo_options);
+    $stats = $bdd->prepare("SELECT Username, NbeFollowers, NbeFollowing, NbeLikes, NbeLikesAttente, NbeRejected FROM Stats WHERE SCid = $myID ORDER BY Date DeSC LIMIT 1");
+    $stats->execute();
+    $result = $stats->fetch();
+
+    return $result;
+  }
+
+  function getSC($client, $id) {
+      $son = json_decode($client->get("tracks/$id.json"));
+      return $son;
+  }
+
+  function getTS($id) {
+    $pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+    $bdd = new PDO(DSN, DB_USERNAME, DB_PASSWORD, $pdo_options);
+    $req = $bdd->prepare("SELECT Count  FROM FLikes WHERE SCid = $id"); //ordre par nombre de like
+    $req->execute();
+    $count = $req->fetch();
+    $req = $bdd->prepare("SELECT Liked/Count FROM FLikes WHERE SCid = $id"); //ordre par ratio
+    $req->execute();
+    $ratio = $req->fetch();
+    $res = array(intval($ratio[0]), $count[0]);
+    return $res; 
+  }
+
+  print_r($client);
+   $son = json_decode($client->get("me.json"));
+   print_r($son);
   $index = getAction($client);
   $pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
   $bdd = new PDO(DSN, DB_USERNAME, DB_PASSWORD, $pdo_options);
@@ -156,21 +188,29 @@
           </div>  
           <div class="row">
             <div class="col-6 col-sm-6 col-lg-4">
-              <h2>Stats Chanson</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+              <h2>Sur Soundcloud</h2>
+              <?php
+                $scinfos = getSC($client, $result[0]);
+                echo "<p>";
+                print_r($scinfos->user->username);
+                echo " a publié ce son qui a été joué $scinfos->playback_count fois, liké $scinfos->favoritings_count et commenté $scinfos->comment_count fois.";
+              ?>
+              <p><a class="btn btn-default" TARGET=_BLANK href="<?php echo $scinfos->permalink_url; ?>" role="button">Sur Soundcloud &raquo;</a></p>
             </div><!--/span-->
             <div class="col-6 col-sm-6 col-lg-4">
-              <h2>Stats Top Sounds</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+              <h2>Sur Top Sounds</h2>
+              <?php
+                $tsinfos = getTS($result[0]);
+                echo "<p>Ce son a été liké $tsinfos[1] fois par les utilisateurs que vous suivez et qui vous suivent. De plus il présente un ratio de $tsinfos[0] entre les likes de vos connexion et ceux de Soundcloud</p>";
+              ?>
+              <p><a class="btn btn-default" TARGET=_BLANK href="about.php#calcul" role="button">Mode de calcul &raquo;</a></p>
             </div><!--/span-->
             <div class="col-6 col-sm-6 col-lg-4">
-              <h2>Stats Moi sur SC</h2>
-              <p>Followers</p>
-              <p>Followings</p>
-              <p>Likes</p>
-              <p>Name</p>
+              <h2><?php $infos = getStats(); echo $infos['Username']; ?></h2>
+              <?php
+              //Username, NbeFollowers, NbeFollowing, NbeLikes, NbeLikesAttente, NbeRejected
+                echo "<p>Aujourd'hui vous suivez $infos[2] utilisateurs et $infos[1] autres vous suivent en retour. Vous avez aimé $infos[3] chansons différentes, $infos[4] sont en attente sur Top Sounds et vous en avez déjà rejetées $infos[5].</p>" ;
+              ?>
               <p><a class="btn btn-default" href="https://soundcloud.com/" TARGET=_BLANK role="button">Voir mon profil &raquo;</a></p>
             </div><!--/span-->
           </div><!--/row-->
