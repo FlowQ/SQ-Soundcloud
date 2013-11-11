@@ -2,16 +2,17 @@
   session_start();
   error_reporting(E_ALL);
   if(strpos($_SERVER['HTTP_HOST'], 'localhost')!==false) {
-    require_once ('config_dev.php'); //dev
+    require_once ('Config/config_dev.php'); //dev
     echo "dev'";
   } else {
-    require_once ('config.php'); //prod
+    require_once ('Config/config.php'); //prod
   }  
   require_once 'Services/Soundcloud.php';
   $client = new Services_Soundcloud(APP_ID, APP_SECRET, CALLBACK_URL);
   if(isset($_GET['code'])) {
     callback($client);
   }
+  $client->setAccessToken($_SESSION['token']['access_token']);
 
   function callback($client) {
     $code = $_GET['code'];
@@ -21,7 +22,6 @@
     ));
     $_SESSION['token'] = $client->accessToken($code);
   }
-  $client->setAccessToken($_SESSION['token']['access_token']);
 
   function getAction($client) {
     $index = 1;
@@ -94,9 +94,6 @@
     return $res; 
   }
 
-  print_r($client);
-   $son = json_decode($client->get("me.json"));
-   print_r($son);
   $index = getAction($client);
   $pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
   $bdd = new PDO(DSN, DB_USERNAME, DB_PASSWORD, $pdo_options);
@@ -123,10 +120,10 @@
     <title>TopSounds for Soundcloud</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="dist/css/bootstrap.css" rel="stylesheet">
+    <link href="Data/dist/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="offcanvas.css" rel="stylesheet">
+    <link href="Data/dist/offcanvas.css" rel="stylesheet">
 
     <!-- my CSS -->
     <link href="Data/topsounds.css" rel="stylesheet">
@@ -250,7 +247,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="dist/js/bootstrap.js"></script>
-    <script src="offcanvas.js"></script>
+    <script src="Data/dist/js/bootstrap.js"></script>
+    <script src="Data/dist/offcanvas.js"></script>
   </body>
 </html>
