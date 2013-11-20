@@ -1,3 +1,4 @@
 *.sql
 phpinfo.php
 .DS_Store
+!*soundcloud.sql

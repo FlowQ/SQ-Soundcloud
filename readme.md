@@ -7,7 +7,7 @@ Et mon service en ligne est mis à disposition sur un serveur cloud Amazon (AWS)
 
 
 
-- Pour tester le projet sur votre propre poste il vous faut créer une base de donnée MySQL nommée ‘soundcloud’ et dont les tables sont générées par le script ‘soundcloud.sql’. De plus veillez à bien configurer le fichier de config, notamment le CALLBACK_URL.
+- Pour tester le projet sur votre propre poste il vous faut créer une base de donnée MySQL nommée ‘soundcloud’ et dont les tables sont générées par le script ‘Scripts/soundcloud.sql’. De plus veillez à bien configurer le fichier de config, notamment le CALLBACK_URL.
 
 De plus afin d’utiliser correctement le service, vous devez vous créer un compte Soundcloud, à partir du quel vous devez suivre au moins 20 autres utilisateurs ‘proches’, c’est à dire se suivant les uns les autres. Top Sounds nécessite l’indexation d’un nombre relativement important de sons afin de proposer des résultats intéressant, en dessous de 1000 titres synchronisés le système de recommandation n’est pas très efficace.
 
