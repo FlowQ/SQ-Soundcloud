@@ -27,3 +27,13 @@
 	line-height: 1.1;
 	color: inherit;
 }
+
+.maj {
+	font-size: 18px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+.maj img {
+	width: 100px;
+}
