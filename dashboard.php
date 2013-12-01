@@ -84,7 +84,6 @@ error_reporting(-1);
     $del = $bdd->prepare("DELETE FROM FLikes WHERE SCid = $id AND TSuid = ".$_SESSION['TSuid']); 
     $reject = $bdd->prepare("INSERT INTO Rejected (SCid, TSuid, Title, Artist, Count, Liked) VALUES (:scid, :tsuid, :t, :a, :c, :l)");
     $reject->execute(array('scid' => $res[0], 'tsuid' => $_SESSION['TSuid'], 't' => $res[1], 'a' => $res[2], 'c' => $res[3], 'l' => $res[4]));
-
     $del->execute();
   }
 
@@ -151,6 +150,7 @@ error_reporting(-1);
         $result[] = $son->fetch();
       }
     }
+
     return $result;
   }
 
